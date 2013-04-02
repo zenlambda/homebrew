@@ -1,10 +1,11 @@
 require 'formula'
 require 'set'
+
+# This is necessary to avoid downloading the 'BoneYard' directory, that
+# contains old binaries for different platforms.
 class IgnoreBoneyardSubversionDownloadStrategy < SubversionDownloadStrategy
   def fetch_repo target, url, revision=nil, ignore_externals=false
-    # Use "svn up" when the repository already exists locally.
-    # This saves on bandwidth and will have a similar effect to verifying the
-    # cache as it will make any changes to get the right revision.
+		# This code was shamelessly ripped from SubversionDownloadStrategy#fetch_repo
 		svncommand = target.exist? ? 'up' : 'checkout'
     args = [@@svn, svncommand]
     # SVN shipped with XCode 3.1.4 can't force a checkout.
@@ -18,10 +19,13 @@ class IgnoreBoneyardSubversionDownloadStrategy < SubversionDownloadStrategy
 
 		d = Dir.new(target)
 		d.each { |c|
+			path = File.join(target,c)
+			# TODO if we just build spim, maybe we should just checkout the dirs it needs 
+			# rather than excluding 'BoneYard'
 			unless Set['BoneYard','.svn','.','..'].include?(c) || 
-				!File.directory?(File.join(target,c)) then
+				!File.directory?(path) then
 				args = [@@svn, 'update'] 
-				args << File.join(target,c)
+				args << path
 				args << '--set-depth'
 				args << 'infinity'
 
