@@ -14,19 +14,18 @@ class IgnoreBoneyardSubversionDownloadStrategy < SubversionDownloadStrategy
     args << '-r' << revision if revision
 		args << '--depth' << 'immediates' if !target.exist?
     args << '--ignore-externals' if ignore_externals
-		ohai "executing #{args}"
-    safe_system(*args)
+    quiet_safe_system(*args)
 
 		d = Dir.new(target)
 		d.each { |c|
-			unless Set['BoneYard','.svn','.','..'].include?(c) || !File.directory?(File.join(target,c)) then
+			unless Set['BoneYard','.svn','.','..'].include?(c) || 
+				!File.directory?(File.join(target,c)) then
 				args = [@@svn, 'update'] 
 				args << File.join(target,c)
 				args << '--set-depth'
 				args << 'infinity'
 
-				ohai "executing #{args}"
-				safe_system(*args)
+				quiet_safe_system(*args)
 			end
 		}
 	end
@@ -41,7 +40,16 @@ class Spimsimulator < Formula
 		system "mkdir -p #{prefix}/bin" 
 		system "mkdir -p #{prefix}/share/man/man1"
 
-    system "make BIN_DIR=#{prefix}/bin EXCEPTION_DIR=#{prefix}/share/spim MAN_DIR=#{prefix}/share/man/man1 -C spim install" 
+		makecmd = [ 'make' ]
+		makecmd << "BIN_DIR=#{prefix}/bin"
+		makecmd << "EXCEPTION_DIR=#{prefix}/share/spim"
+		makecmd << "MAN_DIR=#{prefix}/share/man/man1" 
+		makecmd << "-C spim"
+		makecmd << "install" 
+
+		system(makecmd.join(' '))
+
+    #system "make BIN_DIR=#{prefix}/bin EXCEPTION_DIR=#{prefix}/share/spim MAN_DIR=#{prefix}/share/man/man1 -C spim install" 
  		man1.install "Documentation/spim.man" => "spim.1"
   end
 
