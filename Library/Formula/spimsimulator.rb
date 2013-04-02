@@ -14,6 +14,7 @@ class IgnoreBoneyardSubversionDownloadStrategy < SubversionDownloadStrategy
     args << '-r' << revision if revision
 		args << '--depth' << 'immediates' if !target.exist?
     args << '--ignore-externals' if ignore_externals
+		ohai "executing #{args}"
     safe_system(*args)
 
 		d = Dir.new(target)
@@ -23,25 +24,25 @@ class IgnoreBoneyardSubversionDownloadStrategy < SubversionDownloadStrategy
 				args << File.join(target,c)
 				args << '--set-depth'
 				args << 'infinity'
-			end
+
+				ohai "executing #{args}"
 				safe_system(*args)
+			end
 		}
 	end
 
 end
 class Spimsimulator < Formula
   homepage 'http://spimsimulator.sourceforge.net/'
-  head 'http://spimsimulator.svn.sourceforge.net/svnroot/spimsimulator/', :using => IgnoreBoneyardSubversionDownloadStrategy 
-  
+	head 'http://spimsimulator.svn.sourceforge.net/svnroot/spimsimulator/', :using => IgnoreBoneyardSubversionDownloadStrategy 
+    
 	def install
 		ENV.append 'DESTDIR', prefix
-		system "mkdir -p #{prefix}/usr/bin" 
+		system "mkdir -p #{prefix}/bin" 
+		system "mkdir -p #{prefix}/share/man/man1"
 
-    system "make -C spim " 
-    system "make -C spim install" 
-
-		bin.install_symlink 'usr/bin/spim'
-		bin.install "#{prefix}/usr/bin"
+    system "make BIN_DIR=#{prefix}/bin EXCEPTION_DIR=#{prefix}/share/spim MAN_DIR=#{prefix}/share/man/man1 -C spim install" 
+ 		man1.install "Documentation/spim.man" => "spim.1"
   end
 
   test do
