@@ -37,7 +37,7 @@ class IgnoreBoneyardSubversionDownloadStrategy < SubversionDownloadStrategy
 end
 class Spim < Formula
   homepage 'http://spimsimulator.sourceforge.net/'
-	version '9.1.8'
+  version '9.1.8'
   url 'http://spimsimulator.svn.sourceforge.net/svnroot/spimsimulator/', :using => IgnoreBoneyardSubversionDownloadStrategy, :revision => '603' # this is the revision from when Changlog last had a version update
   head 'http://spimsimulator.svn.sourceforge.net/svnroot/spimsimulator/', :using => IgnoreBoneyardSubversionDownloadStrategy
 
@@ -59,11 +59,19 @@ class Spim < Formula
   end
 
   test do
-    # `test do` will create, run in and delete a temporary directory.
-    #
-    # This test will fail and we won't accept that! It's enough to just replace
-    # "false" with the main program this formula installs, but it'd be nice if you
-    # were more thorough. Run the test with `brew test spimsimulator`.
-    system "true"
+    (testpath/'test.sp').write <<-'EOF'.undent
+      .globl main
+      main:
+
+        .data
+      str:  .asciiz "Hello, World!"
+        .text
+
+        li $v0, 4 # system call code for print_str
+        la $a0, str # address of string to print
+        syscall 
+    EOF
+    system "spim -file test.sp"
   end
+  
 end
