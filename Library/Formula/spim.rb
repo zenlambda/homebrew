@@ -69,9 +69,9 @@ class Spim < Formula
 
         li $v0, 4 # system call code for print_str
         la $a0, str # address of string to print
-        syscall 
+        syscall
     EOF
     system "spim -file test.sp"
   end
-  
+
 end
