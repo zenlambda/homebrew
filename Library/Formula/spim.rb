@@ -37,6 +37,8 @@ class IgnoreBoneyardSubversionDownloadStrategy < SubversionDownloadStrategy
 end
 class Spim < Formula
   homepage 'http://spimsimulator.sourceforge.net/'
+	version '9.1.8'
+  url 'http://spimsimulator.svn.sourceforge.net/svnroot/spimsimulator/', :using => IgnoreBoneyardSubversionDownloadStrategy, :revision => '603' # this is the revision from when Changlog last had a version update
   head 'http://spimsimulator.svn.sourceforge.net/svnroot/spimsimulator/', :using => IgnoreBoneyardSubversionDownloadStrategy
 
   def install
